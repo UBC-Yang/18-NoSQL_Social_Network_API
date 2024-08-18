@@ -1,6 +1,7 @@
 const { Thought, User } = require('../models');
 
 module.exports = {
+    // get all thoughts
     async getThoughts(req, res) {
         try {
             const thoughts = await Thought.find();
@@ -9,20 +10,20 @@ module.exports = {
             res.status(500).json(err)
         }
     },
+    // get one thought by id
     async getSingleThought(req, res) {
         try {
             const thought = await Thought.findOne({ _id: req.params.thoughtId });
 
             if (!thought) {
-                return res.status(404).json({ message: 'No thought found' });
-            } else {
-                res.json(thought);
-            }
-
+                return res.status(404).json({ message: 'Thought not found' });
+            } 
+            res.json(thought);
         } catch (err) {
             res.status(500).json(err)
         }
     },
+    // create a new thought associated to user
     async createThought(req, res) {
         try {
             const thought = await Thought.create(req.body);
@@ -36,14 +37,13 @@ module.exports = {
                 return res
                   .status(404)
                   .json({ message: 'Thought created, user not found' });
-            } else {
-                res.json('Created the thought!')
-            }
-
+            } 
+            res.json('Created the thought!');
         } catch (err) {
             res.status(500).json(err);
         }
     },
+    // delete thought by id
     async deleteThought(req, res) {
         try {
             const thought = await Thought.findByIdAndDelete({ _id:req.params.thoughtId });
@@ -52,6 +52,7 @@ module.exports = {
             res.status(500).json(err);
         }
     },
+    // update thought by id
     async updateThought(req, res) {
         try {
             const thought = await Thought.findByIdAndUpdate(req.params.thoughtId, req.body, {
@@ -60,15 +61,13 @@ module.exports = {
 
             if(!thought) {
                 res.status(400).json({ message: 'Thought not found' });
-            } else {
-                res.json(thought);
-            }
-
+            } 
+            res.json(thought);
         } catch (err) {
             res.status(500).json(err);
         }
     },
-    // Reaction
+    // create reaction
     async createReaction(req, res) {
         try {
             const thought = await Thought.findOneAndUpdate(
@@ -82,6 +81,7 @@ module.exports = {
             res.status(500).json(err);
         }
     },
+    // delete reaction
     async deleteReaction(req, res) {
         try {
             const thought = await Thought.findOneAndUpdate(
