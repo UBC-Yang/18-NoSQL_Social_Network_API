@@ -1,4 +1,4 @@
-const { User } = require('../models/User');
+const { User } = require('../models');
 
 module.exports = {
     // get all user
@@ -7,7 +7,8 @@ module.exports = {
             const users = await User.find();
             res.json(users);
         } catch (err) {
-            res.status(500).json(err);
+            console.error('Error fetching all users:', err);
+            res.status(500).json({ message: 'Failed to retrieve users', error: err.message });
         }
     },
     // get one user by id
@@ -20,29 +21,36 @@ module.exports = {
             } 
             res.json(user);
         } catch (err) {
-            res.status(500).json(err);
+            console.error(`Error fetching user with ID ${req.params.userId}:`, err);
+            res.status(500).json({ message: 'Failed to retrieve user', error: err.message });
         }
     },
     // create a user
     async createUser(req, res) {
         try {
             const user = await User.create(req.body);
-            res.json(user);
+            res.status(201).json(user);
         } catch (err) {
-            res.status(500).json(err);
+            console.error('Error creating user:', err);
+            res.status(500).json({ message: 'Failed to create user', error: err.message });
         }
     },
     // update user
     async updateUser(req, res) {
         try {
-            const user = await User.findOneAndUpdate(req.params.userId, req.body, { new: true });
+            const user = await User.findOneAndUpdate(
+                { _id: req.params.userId },
+                req.body,
+                { new: true }
+            );
 
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
             res.json(user);
         } catch (err) {
-            res.status(500).json(err);
+            console.error(`Error updating user with ID ${req.params.userId}:`, err);
+            res.status(500).json({ message: 'Failed to update user', error: err.message });
         }
     },
     // delete user
@@ -55,7 +63,8 @@ module.exports = {
             }
             res.json({ message: 'User deleted successfully' });
         } catch (err) {
-            res.status(500).json(err);
+            console.error(`Error deleting user with ID ${req.params.userId}:`, err);
+            res.status(500).json({ message: 'Failed to delete user', error: err.message });
         }
     },
     // add friend to user's friend list
@@ -71,7 +80,8 @@ module.exports = {
             }
             res.json(user);
         } catch (err) {
-            res.status(500).json(err);
+            console.error(`Error adding friend to user with ID ${req.params.userId}:`, err);
+            res.status(500).json({ message: 'Failed to add friend', error: err.message });
         }
     },
     // remove friend from user's friend list
@@ -85,14 +95,10 @@ module.exports = {
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
-            const removed = !user.friends.includes(req.params.friendId);
-            if (removed) {
-                res.json({ message: 'Friend removed successfully!', user });
-            } else {
-                res.json(user);
-            }
+            res.json({ message: 'Friend removed successfully!', user });
         } catch (err) {
-            res.status(500).json(err);
+            console.error(`Error removing friend from user with ID ${req.params.userId}:`, err);
+            res.status(500).json({ message: 'Failed to remove friend', error: err.message });
         }
     },
 };
